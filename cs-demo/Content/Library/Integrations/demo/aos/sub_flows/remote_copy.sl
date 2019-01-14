@@ -7,6 +7,14 @@ flow:
     - password: admin@123
     - url: 'http://vmdocker.hcm.demo.local:36980/job/AOS-repo/ws/deploy_war.sh'
   workflow:
+    - extract_filename:
+        do:
+          io.cloudslang.demo.aos.tools.extract_filename:
+            - url: '${url}'
+        publish:
+          - filename
+        navigate:
+          - SUCCESS: get_file
     - get_file:
         do:
           io.cloudslang.base.http.http_client_action:
@@ -21,7 +29,7 @@ flow:
           io.cloudslang.base.remote_file_transfer.remote_secure_copy:
             - source_path: '${filename}'
             - destination_host: '${host}'
-            - destination_path: " '/tmp'"
+            - destination_path: "${get_sp('script_location')}"
             - destination_username: '${username}'
             - destination_password:
                 value: '${password}'
@@ -29,12 +37,6 @@ flow:
         navigate:
           - SUCCESS: SUCCESS
           - FAILURE: on_failure
-    - extract_filename:
-        do:
-          io.cloudslang.demo.aos.tools.extract_filename:
-            - url: '${host}'
-        navigate:
-          - SUCCESS: get_file
   outputs:
     - filename: '${filename}'
   results:
@@ -43,6 +45,12 @@ flow:
 extensions:
   graph:
     steps:
+      extract_filename:
+        x: 314
+        y: 92
+      get_file:
+        x: 312
+        y: 266
       remote_secure_copy:
         x: 535
         y: 264
@@ -50,12 +58,6 @@ extensions:
           4bab6e65-2d3e-9402-2489-cd579f0fa47d:
             targetId: ecc26c7a-78e5-3576-edf3-a78b041e2f8f
             port: SUCCESS
-      get_file:
-        x: 312
-        y: 267
-      extract_filename:
-        x: 315
-        y: 105
     results:
       SUCCESS:
         ecc26c7a-78e5-3576-edf3-a78b041e2f8f:
